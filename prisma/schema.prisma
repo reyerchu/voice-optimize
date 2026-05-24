@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Anonymous browser-bound session — no login, scoped by cookie
+model Session {
+  id        String    @id @default(cuid())
+  createdAt DateTime  @default(now())
+  lastSeen  DateTime  @default(now())
+  projects  Project[]
+}
+
+enum ProjectStatus {
+  UPLOADED
+  TRANSCRIBING
+  READY
+  ERROR
+}
+
+model Project {
+  id            String        @id @default(cuid())
+  sessionId     String
+  title         String
+  originalName  String
+  originalPath  String
+  durationSec   Float?
+  mimeType      String
+  sizeBytes     Int
+  status        ProjectStatus @default(UPLOADED)
+  errorMessage  String?
+  // transcript = { language, segments: [{ start, end, text, words: [{w, s, e}] }] }
+  transcript    Json?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  session Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  exports Export[]
+
+  @@index([sessionId])
+  @@index([status])
+}
+
+model Export {
+  id          String   @id @default(cuid())
+  projectId   String
+  path        String
+  durationSec Float
+  sizeBytes   Int
+  // keepSegments = [{ start, end }] — the time ranges kept from the original
+  keepSegments Json
+  createdAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
