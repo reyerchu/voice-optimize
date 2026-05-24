@@ -38,9 +38,6 @@ export default function Editor({ projectId }: { projectId: string }) {
   const [exporting, setExporting] = useState(false);
   const [exportErr, setExportErr] = useState<string | null>(null);
   const [exports, setExports] = useState<ExportItem[]>([]);
-  const [shownotes, setShownotes] = useState<Record<string, unknown> | null>(null);
-  const [snLoading, setSnLoading] = useState(false);
-  const [snErr, setSnErr] = useState<string | null>(null);
 
   const waveRef = useRef<HTMLDivElement>(null);
   const wsRef = useRef<{ destroy: () => void; setTime: (t: number) => void; playPause: () => void; play: () => void; pause: () => void; isPlaying: () => boolean } | null>(null);
@@ -163,21 +160,6 @@ export default function Editor({ projectId }: { projectId: string }) {
     } else {
       const e = await res.json().catch(() => ({}));
       setExportErr(e.error ?? "匯出失敗");
-    }
-  };
-
-  const genShownotes = async () => {
-    setSnLoading(true);
-    setSnErr(null);
-    setShownotes(null);
-    const res = await fetch(`/api/projects/${projectId}/shownotes`, { method: "POST" });
-    setSnLoading(false);
-    if (res.ok) {
-      const d = await res.json();
-      setShownotes(d.result);
-    } else {
-      const d = await res.json().catch(() => ({}));
-      setSnErr(d.error ?? "產生失敗");
     }
   };
 
@@ -333,24 +315,6 @@ export default function Editor({ projectId }: { projectId: string }) {
                 </ul>
               </div>
             )}
-
-            <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
-              <h3 className="mb-2 font-semibold">AI 後製素材</h3>
-              <p className="mb-3 text-xs text-zinc-500">由逐字稿產生標題、摘要、章節與社群貼文。</p>
-              <button
-                onClick={genShownotes}
-                disabled={snLoading}
-                className="w-full rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium hover:bg-zinc-600 disabled:opacity-50"
-              >
-                {snLoading ? "產生中…" : "✨ 產生 Show Notes"}
-              </button>
-              {snErr && <p className="mt-2 text-xs text-red-400">{snErr}</p>}
-              {shownotes && (
-                <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap rounded-lg bg-zinc-950 p-3 text-xs text-zinc-300">
-                  {JSON.stringify(shownotes, null, 2)}
-                </pre>
-              )}
-            </div>
           </div>
         </div>
       )}

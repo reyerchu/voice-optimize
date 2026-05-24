@@ -17,7 +17,6 @@
   - EBU R128 響度正規化到 -16 LUFS（`loudnorm`，Podcast 標準）
   - 移除過長靜默（`silenceremove`）
 - **匯出 MP3** 並下載
-- **AI Show Notes**：標題、摘要、章節、社群貼文（Claude）
 
 無需登入，以瀏覽器 cookie 綁定匿名 session。
 
@@ -30,7 +29,6 @@
 | 資料庫 | PostgreSQL + Prisma 7（`Session` / `Project` / `Export`） |
 | 逐字稿 | 內部 S2T（Whisper）HTTP 服務 |
 | 音訊處理 | 本機 ffmpeg（`afftdn`、`loudnorm`、`silenceremove`、`atrim`+`concat`） |
-| AI 文案 | Anthropic Claude（`@anthropic-ai/sdk`） |
 
 ## 開發
 
